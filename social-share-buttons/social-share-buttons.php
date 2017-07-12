@@ -7,7 +7,7 @@ Text Domain: social-share-buttons
 Version: 0.0.1
 */
 
-// If this file is called directly, abort
+/* If this file is called directly, abort */
 if ( ! defined( 'WPINC' ) ) 
 	die;
 
@@ -24,22 +24,34 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             return self::$instance;
         }
 
+        /* Holds settings configured in the admin page */
+        private $settings;
+
         /* Constructor */
         private function __construct() {
+            /* Get settings from DB */
+            $this->settings = get_option( 'ssb_settings' );
+
             /* Back end */
-            add_action( 'admin_enqueue_scripts', array( $this, 'enqueueStylesScripts') );
+            add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminStylesScripts') );
             add_action( 'admin_menu', array( $this, 'addAdminMenu') );
             add_action( 'admin_init', array( $this, 'addAdminSettings') );
 
             /* Front end */
-            add_filter( 'the_title', array( $this, 'filterTitle') );
-            //add_action( 'wp_enqueue_scripts', array( $this, 'front_scripts' ), 10 );
+            add_filter( 'the_content', array( $this, 'filterContent') );
+            add_filter( 'post_thumbnail_html', array( $this, 'filterPostThumbnailHtml') );
+            add_action( 'wp_enqueue_scripts', array( $this, 'enqueueStylesScripts') );
+        }
+
+        function enqueueAdminStylesScripts() {
+            wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' );
+            wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons-admin.css' );
+            wp_enqueue_script( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons-admin.js', array( 'jquery', 'scriptaculous-dragdrop' ) );
         }
 
         function enqueueStylesScripts() {
             wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' );
-            wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons-admin.css' );
-            wp_enqueue_script( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons-admin.js', array( 'jquery', 'scriptaculous-dragdrop' ) );
+            wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons.css' );
         }
 
         function addAdminMenu() {
@@ -189,7 +201,7 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             <div id="ssb_admin-sortable-list-container">
                 <input id="ssb_admin-icon-order-hidden-input" type="hidden" name="ssb_settings[order]" value="ftgplw" />
                 <?php 
-                $order = get_option( 'ssb_settings' )['order'];
+                $order = $this->settings['order'];
                 for ($i = 0; $i < strlen($order); $i++){
                     echo "<i class='fa fa-";
                     switch($order[$i]){
@@ -220,13 +232,77 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         }
         
 
+        function filterContent( $content ) {
+            $postLink = get_the_permalink();
+            if(is_single())
+                $content .= $this->getButtonsHtml($postLink);
+            return $content;
+        }
 
+        function filterPostThumbnailHtml( $html ) {
+            if($this->settings['placing'] != 'inside_image')
+                return $html;
+            
+            $postLink = get_the_permalink();
+            if (is_single())
+            {
+                $buttonsHtml = $this->getButtonsHtml($postLink);
+                $html = "<div class='ssb_thumbnail-wrapper'>{$html}{$buttonsHtml}</div>";
+            }
+            return $html;
+        }
 
-        function filterTitle( $title ) {
-            $a = get_the_permalink();
-            $custom_title = "<div>YOUR CONTENT GOES HERE, {$a}</div>";
-            $title .= $custom_title;
-            return $title;
+        function getButtonsHtml($postLink){
+            $html = "<div class='ssb_buttons-wrapper'>";
+            $order = $this->settings['order'];
+            for ($i = 0; $i < strlen($order); $i++){
+                switch($order[$i]){
+                    case 'f':
+                        $html .= $this->getFacebookButtonHtml($postLink);
+                        break;
+                    case 't':
+                        $html .= $this->getTwitterButtonHtml($postLink);
+                        break;
+                    case 'g':
+                        $html .= $this->getGooglePlusButtonHtml($postLink);
+                        break;
+                    case 'p':
+                        $html .= $this->getPinterestButtonHtml($postLink);
+                        break;
+                    case 'l':
+                        $html .= $this->getLinkedinButtonHtml($postLink);
+                        break;
+                    case 'w':
+                        $html .= $this->getWhatsAppButtonHtml($postLink);
+                        break;
+                }
+            }
+            $html .= "</div>";
+            return $html;
+        }
+
+        function getFacebookButtonHtml($postLink){
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-facebook'></i></a>";
+        }
+
+        function getTwitterButtonHtml($postLink){
+            return "<a target='_blank' href='https://twitter.com/intent/tweet?url={$postLink}'><i class='fa fa-twitter'></i></a>";
+        }
+
+        function getGooglePlusButtonHtml($postLink){
+            return "<a target='_blank' href='https://plus.google.com/share?url={$postLink}'><i class='fa fa-google-plus'></i></a>";
+        }
+
+        function getPinterestButtonHtml($postLink){
+            return "<a target='_blank' href='http://pinterest.com/pin/create/button/?url={$postLink}'><i class='fa fa-pinterest'></i></a>";
+        }
+
+        function getLinkedInButtonHtml($postLink){
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-linkedin'></i></a>";
+        }
+
+        function getWhatsAppButtonHtml($postLink){
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-whatsapp'></i></a>";
         }
 
 

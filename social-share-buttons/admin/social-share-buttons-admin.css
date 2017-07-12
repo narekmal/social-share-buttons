@@ -1,4 +1,9 @@
+#setting-error-ssb_message{margin-left: 2px;}
+
 .ssb_admin-label:not(:last-child){margin-right: 20px;}
 
 .ssb_admin-icon{font-size: 22px; cursor: move}
 .ssb_admin-icon:not(:last-child){margin-right: 10px}
+
+.ssb_thumbnail-wrapper{position: relative}
+.ssb_thumbnail-wrapper .ssb_buttons-wrapper{position: absolute; right: 0; bottom: 0}

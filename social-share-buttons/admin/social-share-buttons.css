@@ -1,0 +1,3 @@
+/* Placement of buttons inside featured image */
+.ssb_thumbnail-wrapper{position: relative}
+.ssb_thumbnail-wrapper .ssb_buttons-wrapper{position: absolute; right: 0; bottom: 0}
