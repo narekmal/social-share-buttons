@@ -27,15 +27,19 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         /* Constructor */
         private function __construct() {
             /* Back end */
+            add_action( 'admin_enqueue_scripts', array( $this, 'enqueueStylesScripts') );
             add_action( 'admin_menu', array( $this, 'addAdminMenu') );
             add_action( 'admin_init', array( $this, 'addAdminSettings') );
-            // add_action      ( 'admin_enqueue_scripts',              array( $this, 'admin_scripts'           )           );
-            // add_action      ( 'save_post',                          array( $this, 'save_custom_meta'        ),  1       );
 
             /* Front end */
             add_filter( 'the_title', array( $this, 'filterTitle') );
-            // add_action      ( 'wp_enqueue_scripts',                 array( $this, 'front_scripts'           ),  10      );
-            
+            //add_action( 'wp_enqueue_scripts', array( $this, 'front_scripts' ), 10 );
+        }
+
+        function enqueueStylesScripts() {
+            wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' );
+            wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons-admin.css' );
+            wp_enqueue_script( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons-admin.js', array( 'jquery', 'scriptaculous-dragdrop' ) );
         }
 
         function addAdminMenu() {
@@ -101,6 +105,22 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
                 'share_button_settings',
                 'ssb_settings_section'
             );
+
+            add_settings_field(
+                'ssb_settings_icons_placing',
+                'Placing of Social Share Bar',
+                array( $this, 'outputIconPlacingField'),
+                'share_button_settings',
+                'ssb_settings_section'
+            );
+
+            add_settings_field(
+                'ssb_settings_icons_order',
+                'Order of Icons',
+                array( $this, 'outputIconOrderField'),
+                'share_button_settings',
+                'ssb_settings_section'
+            );
         }
 
         function outputIconSizeField() {
@@ -115,33 +135,92 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
 
         function outputIconVisibilityField() {
             ?>
-            <label>
-                <input type="checkbox" name="ssb_settings[facebook_visibility]" <?php echo get_option( 'ssb_settings' )['facebook_visibility'] ? 'checked' : ''; ?> />
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[facebook_visibility]" <?php echo get_option( 'ssb_settings' )['facebook_visibility'] ? 'checked' : ''; ?> >
                 Facebook
             </label>
-            <label>
+            <label class="ssb_admin-label">
                 <input type="checkbox" name="ssb_settings[twitter_visibility]" <?php echo get_option( 'ssb_settings' )['twitter_visibility'] ? 'checked' : ''; ?> />
                 Twitter
             </label>
-            <label>
+            <label class="ssb_admin-label">
                 <input type="checkbox" name="ssb_settings[googleplus_visibility]" <?php echo get_option( 'ssb_settings' )['googleplus_visibility'] ? 'checked' : ''; ?> />
                 Google+
             </label>
-            <label>
+            <label class="ssb_admin-label">
                 <input type="checkbox" name="ssb_settings[pinterest_visibility]" <?php echo get_option( 'ssb_settings' )['pinterest_visibility'] ? 'checked' : ''; ?> />
                 Pinterest
             </label>
-            <label>
+            <label class="ssb_admin-label">
                 <input type="checkbox" name="ssb_settings[linkedin_visibility]" <?php echo get_option( 'ssb_settings' )['linkedin_visibility'] ? 'checked' : ''; ?> />
                 LinkedIn
             </label>
-            <label>
+            <label class="ssb_admin-label">
                 <input type="checkbox" name="ssb_settings[whatsapp_visibility]" <?php echo get_option( 'ssb_settings' )['whatsapp_visibility'] ? 'checked' : ''; ?> />
                 Whatsapp (shown only on mobile displays)
             </label>
             <?php
         }
+
         
+        function outputIconPlacingField() {
+            ?>
+            <label class="ssb_admin-label">
+                <input type="radio" name="ssb_settings[placing]" value="below_title" <?php echo get_option( 'ssb_settings' )['placing'] == 'below_title' ? 'checked' : ''; ?> />
+                Below the Post Title
+            </label>
+            <label class="ssb_admin-label">
+                <input type="radio" name="ssb_settings[placing]" value="floating" <?php echo get_option( 'ssb_settings' )['placing'] == 'floating' ? 'checked' : ''; ?> />
+                Floating on the Left Area
+            </label>
+            <label class="ssb_admin-label">
+                <input type="radio" name="ssb_settings[placing]" value="after_content" <?php echo get_option( 'ssb_settings' )['placing'] == 'after_content' ? 'checked' : ''; ?> />
+                After the Post Content
+            </label>
+            <label class="ssb_admin-label">
+                <input type="radio" name="ssb_settings[placing]" value="inside_image" <?php echo get_option( 'ssb_settings' )['placing'] == 'inside_image' ? 'checked' : ''; ?> />
+                Inside the Featured Image
+            </label>
+            <?php
+        }
+
+        function outputIconOrderField() {
+            ?>
+            <div id="ssb_admin-sortable-list-container">
+                <input id="ssb_admin-icon-order-hidden-input" type="hidden" name="ssb_settings[order]" value="ftgplw" />
+                <?php 
+                $order = get_option( 'ssb_settings' )['order'];
+                for ($i = 0; $i < strlen($order); $i++){
+                    echo "<i class='fa fa-";
+                    switch($order[$i]){
+                        case 'f':
+                            echo 'facebook';
+                            break;
+                        case 't':
+                            echo 'twitter';
+                            break;
+                        case 'g':
+                            echo 'google-plus';
+                            break;
+                        case 'p':
+                            echo 'pinterest';
+                            break;
+                        case 'l':
+                            echo 'linkedin';
+                            break;
+                        case 'w':
+                            echo 'whatsapp';
+                            break;
+                    }
+                    echo  " ssb_admin-icon'></i>";
+                }
+                ?>
+            </div>
+            <?php
+        }
+        
+
+
 
         function filterTitle( $title ) {
             $a = get_the_permalink();
