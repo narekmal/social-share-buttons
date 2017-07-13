@@ -1,0 +1,8 @@
+/* Placement of buttons inside featured image */
+.ssb_thumbnail-wrapper{position: relative}
+.ssb_thumbnail-wrapper .ssb_buttons-wrapper{position: absolute; right: 0; bottom: 0}
+
+/* Icon sizes */
+.ssb_icon-small{font-size: 18px}
+.ssb_icon-medium{font-size: 28px}
+.ssb_icon-large{font-size: 38px}

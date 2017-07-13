@@ -45,13 +45,13 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
 
         function enqueueAdminStylesScripts() {
             wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' );
-            wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons-admin.css' );
-            wp_enqueue_script( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons-admin.js', array( 'jquery', 'scriptaculous-dragdrop' ) );
+            wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'assets/admin/social-share-buttons-admin.css' );
+            wp_enqueue_script( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'assets/admin/social-share-buttons-admin.js', array( 'jquery', 'scriptaculous-dragdrop' ) );
         }
 
         function enqueueStylesScripts() {
             wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' );
-            wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'admin/social-share-buttons.css' );
+            wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'assets/social-share-buttons.css' );
         }
 
         function addAdminMenu() {
@@ -103,9 +103,17 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             );
         
             add_settings_field(
-                'ssb_settings_icon_size',
+                'ssb_settings_icons_display',
+                'Display Icons',
+                array( $this, 'outputIconsDisplayField'),
+                'share_button_settings',
+                'ssb_settings_section'
+            );
+
+            add_settings_field(
+                'ssb_settings_icons_size',
                 'Size of Icons',
-                array( $this, 'outputIconSizeField'),
+                array( $this, 'outputIconsSizeField'),
                 'share_button_settings',
                 'ssb_settings_section'
             );
@@ -135,7 +143,31 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             );
         }
 
-        function outputIconSizeField() {
+        function outputIconsDisplayField() {
+            ?>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[post_type_post]" <?php echo $this->settings['post_type_post'] ? 'checked' : ''; ?> />
+                On Posts
+            </label>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[post_type_page]" <?php echo $this->settings['post_type_page'] ? 'checked' : ''; ?> />
+                On Pages
+            </label>
+            <?php
+            // Get custom post types as public and 'not builtin' post types 
+            $customPostTypes = get_post_types( array('public' => true,'_builtin' => false), 'objects', 'and' );
+            foreach ($customPostTypes as $customPostType): ?>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[post_type_<?php echo $customPostType->name; ?>]" <?php echo $this->settings["post_type_{$customPostType->name}"] ? 'checked' : ''; ?> />
+                On <?php echo $customPostType->label; ?>
+            </label>
+            <?php endforeach;
+            
+            ?>
+            <?php
+        }
+
+        function outputIconsSizeField() {
             ?>
             <label class="ssb_admin-label">
                 <input type="radio" name="ssb_settings[icons_size]" value="small" <?php echo $this->settings['icons_size'] == 'small' ? 'checked' : ''; ?> />
@@ -239,23 +271,42 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         
 
         function filterContent( $content ) {
+            if(!$this->isCurrentPostTypeDisplayEnabled())
+                return $html;
+            if($this->settings['placing'] != 'after_content')
+                return $html;
+
             $postLink = get_the_permalink();
-            if(is_single())
-                $content .= $this->getButtonsHtml($postLink);
+            $content .= $this->getButtonsHtml($postLink);
+
             return $content;
         }
 
         function filterPostThumbnailHtml( $html ) {
+            if(!$this->isCurrentPostTypeDisplayEnabled())
+                return $html;
             if($this->settings['placing'] != 'inside_image')
                 return $html;
             
             $postLink = get_the_permalink();
-            if (is_single())
-            {
-                $buttonsHtml = $this->getButtonsHtml($postLink);
-                $html = "<div class='ssb_thumbnail-wrapper'>{$html}{$buttonsHtml}</div>";
-            }
+            $buttonsHtml = $this->getButtonsHtml($postLink);
+            $html = "<div class='ssb_thumbnail-wrapper'>{$html}{$buttonsHtml}</div>";
+
             return $html;
+        }
+
+        function isCurrentPostTypeDisplayEnabled() {
+            $postTypes = array();
+            foreach($this->settings as $key => $value){
+                if (0 === strpos($key, "post_type_")) {
+                    // $key starts with "post_type_", push the rest of $key to array
+                    array_push($postTypes, substr($key, strlen("post_type_")));
+                }
+            }
+            if (empty($postTypes)) 
+                return false;
+            else
+                return is_singular($postTypes);
         }
 
         function getButtonsHtml($postLink){
@@ -294,27 +345,33 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         }
 
         function getFacebookButtonHtml($postLink){
-            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-facebook'></i></a>";
+            $iconSize = $this->settings['icons_size'];
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-facebook ssb_icon-{$iconSize}'></i></a>";
         }
 
         function getTwitterButtonHtml($postLink){
-            return "<a target='_blank' href='https://twitter.com/intent/tweet?url={$postLink}'><i class='fa fa-twitter'></i></a>";
+            $iconSize = $this->settings['icons_size'];
+            return "<a target='_blank' href='https://twitter.com/intent/tweet?url={$postLink}'><i class='fa fa-twitter ssb_icon-{$iconSize}'></i></a>";
         }
 
         function getGooglePlusButtonHtml($postLink){
-            return "<a target='_blank' href='https://plus.google.com/share?url={$postLink}'><i class='fa fa-google-plus'></i></a>";
+            $iconSize = $this->settings['icons_size'];
+            return "<a target='_blank' href='https://plus.google.com/share?url={$postLink}'><i class='fa fa-google-plus ssb_icon-{$iconSize}'></i></a>";
         }
 
         function getPinterestButtonHtml($postLink){
-            return "<a target='_blank' href='http://pinterest.com/pin/create/button/?url={$postLink}'><i class='fa fa-pinterest'></i></a>";
+            $iconSize = $this->settings['icons_size'];
+            return "<a target='_blank' href='http://pinterest.com/pin/create/button/?url={$postLink}'><i class='fa fa-pinterest ssb_icon-{$iconSize}'></i></a>";
         }
 
         function getLinkedInButtonHtml($postLink){
-            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-linkedin'></i></a>";
+            $iconSize = $this->settings['icons_size'];
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-linkedin ssb_icon-{$iconSize}'></i></a>";
         }
 
         function getWhatsAppButtonHtml($postLink){
-            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-whatsapp'></i></a>";
+            $iconSize = $this->settings['icons_size'];
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-whatsapp ssb_icon-{$iconSize}'></i></a>";
         }
 
 
