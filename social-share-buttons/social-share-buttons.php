@@ -24,7 +24,7 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             return self::$instance;
         }
 
-        /* Holds settings configured in the admin page */
+        /* Holds settings set in the admin page */
         private $settings;
 
         /* Constructor */
@@ -111,14 +111,6 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             );
 
             add_settings_field(
-                'ssb_settings_icons_visibility',
-                'Visibility of Icons',
-                array( $this, 'outputIconVisibilityField'),
-                'share_button_settings',
-                'ssb_settings_section'
-            );
-
-            add_settings_field(
                 'ssb_settings_icons_placing',
                 'Placing of Social Share Bar',
                 array( $this, 'outputIconPlacingField'),
@@ -127,8 +119,16 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             );
 
             add_settings_field(
+                'ssb_settings_icons_visibility',
+                'Visibility of Icons',
+                array( $this, 'outputIconVisibilityField'),
+                'share_button_settings',
+                'ssb_settings_section'
+            );
+
+            add_settings_field(
                 'ssb_settings_icons_order',
-                'Order of Icons',
+                'Order of Icons (Drag to Change)',
                 array( $this, 'outputIconOrderField'),
                 'share_button_settings',
                 'ssb_settings_section'
@@ -137,44 +137,21 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
 
         function outputIconSizeField() {
             ?>
-            <select name="ssb_settings[icons_size]">
-                <option value="small" <?php echo get_option( 'ssb_settings' )['icons_size'] == 'small' ? 'selected' : ''; ?>>Small</option>
-                <option value="medium" <?php echo get_option( 'ssb_settings' )['icons_size'] == 'medium' ? 'selected' : ''; ?>>Medium</option>
-                <option value="large" <?php echo get_option( 'ssb_settings' )['icons_size'] == 'large' ? 'selected' : ''; ?>>Large</option>
-            </select>
-            <?php
-        }
-
-        function outputIconVisibilityField() {
-            ?>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[facebook_visibility]" <?php echo get_option( 'ssb_settings' )['facebook_visibility'] ? 'checked' : ''; ?> >
-                Facebook
+                <input type="radio" name="ssb_settings[icons_size]" value="small" <?php echo $this->settings['icons_size'] == 'small' ? 'checked' : ''; ?> />
+                Small
             </label>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[twitter_visibility]" <?php echo get_option( 'ssb_settings' )['twitter_visibility'] ? 'checked' : ''; ?> />
-                Twitter
+                <input type="radio" name="ssb_settings[icons_size]" value="medium" <?php echo $this->settings['icons_size'] == 'medium' ? 'checked' : ''; ?> />
+                Medium
             </label>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[googleplus_visibility]" <?php echo get_option( 'ssb_settings' )['googleplus_visibility'] ? 'checked' : ''; ?> />
-                Google+
-            </label>
-            <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[pinterest_visibility]" <?php echo get_option( 'ssb_settings' )['pinterest_visibility'] ? 'checked' : ''; ?> />
-                Pinterest
-            </label>
-            <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[linkedin_visibility]" <?php echo get_option( 'ssb_settings' )['linkedin_visibility'] ? 'checked' : ''; ?> />
-                LinkedIn
-            </label>
-            <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[whatsapp_visibility]" <?php echo get_option( 'ssb_settings' )['whatsapp_visibility'] ? 'checked' : ''; ?> />
-                Whatsapp (shown only on mobile displays)
+                <input type="radio" name="ssb_settings[icons_size]" value="large" <?php echo $this->settings['icons_size'] == 'large' ? 'checked' : ''; ?> />
+                Large
             </label>
             <?php
         }
 
-        
         function outputIconPlacingField() {
             ?>
             <label class="ssb_admin-label">
@@ -192,6 +169,35 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             <label class="ssb_admin-label">
                 <input type="radio" name="ssb_settings[placing]" value="inside_image" <?php echo get_option( 'ssb_settings' )['placing'] == 'inside_image' ? 'checked' : ''; ?> />
                 Inside the Featured Image
+            </label>
+            <?php
+        }
+
+        function outputIconVisibilityField() {
+            ?>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[facebook_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['facebook_visibility'] ? 'checked' : ''; ?> >
+                Facebook
+            </label>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[twitter_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['twitter_visibility'] ? 'checked' : ''; ?> />
+                Twitter
+            </label>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[google-plus_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['google-plus_visibility'] ? 'checked' : ''; ?> />
+                Google+
+            </label>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[pinterest_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['pinterest_visibility'] ? 'checked' : ''; ?> />
+                Pinterest
+            </label>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[linkedin_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['linkedin_visibility'] ? 'checked' : ''; ?> />
+                LinkedIn
+            </label>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[whatsapp_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['whatsapp_visibility'] ? 'checked' : ''; ?> />
+                Whatsapp (shown only on mobile displays)
             </label>
             <?php
         }
@@ -258,22 +264,28 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             for ($i = 0; $i < strlen($order); $i++){
                 switch($order[$i]){
                     case 'f':
-                        $html .= $this->getFacebookButtonHtml($postLink);
+                        if($this->settings['facebook_visibility'])
+                            $html .= $this->getFacebookButtonHtml($postLink);
                         break;
                     case 't':
-                        $html .= $this->getTwitterButtonHtml($postLink);
+                        if($this->settings['twitter_visibility'])
+                            $html .= $this->getTwitterButtonHtml($postLink);
                         break;
                     case 'g':
-                        $html .= $this->getGooglePlusButtonHtml($postLink);
+                        if($this->settings['google-plus_visibility'])
+                            $html .= $this->getGooglePlusButtonHtml($postLink);
                         break;
                     case 'p':
-                        $html .= $this->getPinterestButtonHtml($postLink);
+                        if($this->settings['pinterest_visibility'])
+                            $html .= $this->getPinterestButtonHtml($postLink);
                         break;
                     case 'l':
-                        $html .= $this->getLinkedinButtonHtml($postLink);
+                        if($this->settings['linkedin_visibility'])
+                            $html .= $this->getLinkedinButtonHtml($postLink);
                         break;
                     case 'w':
-                        $html .= $this->getWhatsAppButtonHtml($postLink);
+                        if($this->settings['whatsapp_visibility'])
+                            $html .= $this->getWhatsAppButtonHtml($postLink);
                         break;
                 }
             }
