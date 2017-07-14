@@ -1,11 +1,20 @@
 (function( $ ) {
 
 	$(function() {
+        // Init sortable icon list
         Sortable.create('ssb_admin-sortable-list-container', {
             elements: $$('#ssb_admin-sortable-list-container i'),
             overlap: 'horizontal',
             constraint: 'horizontal',
             onChange: updateOrderHiddenInput
+        });
+
+        // Init color picker
+        $('#ssb_admin-color-picker-container input').wpColorPicker();
+
+        // Select custom color radio button when color picker is opened
+        $('#ssb_admin-color-picker-container .wp-picker-container').click(function(){
+            $('input[name="ssb_settings[icons_color]"][value="custom"]').prop("checked", true);
         });
 
         // Adjust order icons' visibility when page ready and when a checkbox is clicked

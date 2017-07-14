@@ -32,7 +32,7 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             /* Get settings from DB */
             $this->settings = get_option( 'ssb_settings' );
 
-            /* Back end */
+            /* Admin */
             add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminStylesScripts') );
             add_action( 'admin_menu', array( $this, 'addAdminMenu') );
             add_action( 'admin_init', array( $this, 'addAdminSettings') );
@@ -45,8 +45,9 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
 
         function enqueueAdminStylesScripts() {
             wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' );
+            wp_enqueue_style( 'wp-color-picker' );
             wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'assets/admin/social-share-buttons-admin.css' );
-            wp_enqueue_script( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'assets/admin/social-share-buttons-admin.js', array( 'jquery', 'scriptaculous-dragdrop' ) );
+            wp_enqueue_script( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'assets/admin/social-share-buttons-admin.js', array( 'jquery', 'scriptaculous-dragdrop', 'wp-color-picker' ) );
         }
 
         function enqueueStylesScripts() {
@@ -127,9 +128,17 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             );
 
             add_settings_field(
+                'ssb_settings_icons_colors',
+                'Colors of Icons',
+                array( $this, 'outputIconsColorsField'),
+                'share_button_settings',
+                'ssb_settings_section'
+            );
+
+            add_settings_field(
                 'ssb_settings_icons_visibility',
                 'Visibility of Icons',
-                array( $this, 'outputIconVisibilityField'),
+                array( $this, 'outputIconsVisibilityField'),
                 'share_button_settings',
                 'ssb_settings_section'
             );
@@ -187,48 +196,65 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         function outputIconPlacingField() {
             ?>
             <label class="ssb_admin-label">
-                <input type="radio" name="ssb_settings[placing]" value="below_title" <?php echo get_option( 'ssb_settings' )['placing'] == 'below_title' ? 'checked' : ''; ?> />
+                <input type="radio" name="ssb_settings[placing]" value="below_title" <?php echo $this->settings['placing'] == 'below_title' ? 'checked' : ''; ?> />
                 Below the Post Title
             </label>
             <label class="ssb_admin-label">
-                <input type="radio" name="ssb_settings[placing]" value="floating" <?php echo get_option( 'ssb_settings' )['placing'] == 'floating' ? 'checked' : ''; ?> />
+                <input type="radio" name="ssb_settings[placing]" value="floating" <?php echo $this->settings['placing'] == 'floating' ? 'checked' : ''; ?> />
                 Floating on the Left Area
             </label>
             <label class="ssb_admin-label">
-                <input type="radio" name="ssb_settings[placing]" value="after_content" <?php echo get_option( 'ssb_settings' )['placing'] == 'after_content' ? 'checked' : ''; ?> />
+                <input type="radio" name="ssb_settings[placing]" value="after_content" <?php echo $this->settings['placing'] == 'after_content' ? 'checked' : ''; ?> />
                 After the Post Content
             </label>
             <label class="ssb_admin-label">
-                <input type="radio" name="ssb_settings[placing]" value="inside_image" <?php echo get_option( 'ssb_settings' )['placing'] == 'inside_image' ? 'checked' : ''; ?> />
+                <input type="radio" name="ssb_settings[placing]" value="inside_image" <?php echo $this->settings['placing'] == 'inside_image' ? 'checked' : ''; ?> />
                 Inside the Featured Image
             </label>
             <?php
         }
 
-        function outputIconVisibilityField() {
+        function outputIconsColorsField() {
             ?>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[facebook_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['facebook_visibility'] ? 'checked' : ''; ?> >
+                <input type="radio" name="ssb_settings[icons_color]" value="original" <?php echo $this->settings['icons_color'] == 'original' ? 'checked' : ''; ?> />
+                Original Colors
+            </label>
+            <label class="ssb_admin-label">
+                <input type="radio" name="ssb_settings[icons_color]" value="custom" <?php echo $this->settings['icons_color'] == 'custom' ? 'checked' : ''; ?> />
+                All in a Selected Color
+            </label>
+            <div id="ssb_admin-color-picker-container">
+                <input type="text" name="ssb_settings[icons_custom_color]" value="<?php echo $this->settings['icons_custom_color']; ?>">
+            </div>
+            
+            <?php
+        }
+
+        function outputIconsVisibilityField() {
+            ?>
+            <label class="ssb_admin-label">
+                <input type="checkbox" name="ssb_settings[facebook_visibility]" class="ssb_admin-visibility-checkbox" <?php echo $this->settings['facebook_visibility'] ? 'checked' : ''; ?> >
                 Facebook
             </label>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[twitter_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['twitter_visibility'] ? 'checked' : ''; ?> />
+                <input type="checkbox" name="ssb_settings[twitter_visibility]" class="ssb_admin-visibility-checkbox" <?php echo $this->settings['twitter_visibility'] ? 'checked' : ''; ?> />
                 Twitter
             </label>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[google-plus_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['google-plus_visibility'] ? 'checked' : ''; ?> />
+                <input type="checkbox" name="ssb_settings[google-plus_visibility]" class="ssb_admin-visibility-checkbox" <?php echo $this->settings['google-plus_visibility'] ? 'checked' : ''; ?> />
                 Google+
             </label>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[pinterest_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['pinterest_visibility'] ? 'checked' : ''; ?> />
+                <input type="checkbox" name="ssb_settings[pinterest_visibility]" class="ssb_admin-visibility-checkbox" <?php echo $this->settings['pinterest_visibility'] ? 'checked' : ''; ?> />
                 Pinterest
             </label>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[linkedin_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['linkedin_visibility'] ? 'checked' : ''; ?> />
+                <input type="checkbox" name="ssb_settings[linkedin_visibility]" class="ssb_admin-visibility-checkbox" <?php echo $this->settings['linkedin_visibility'] ? 'checked' : ''; ?> />
                 LinkedIn
             </label>
             <label class="ssb_admin-label">
-                <input type="checkbox" name="ssb_settings[whatsapp_visibility]" class="ssb_admin-visibility-checkbox" <?php echo get_option( 'ssb_settings' )['whatsapp_visibility'] ? 'checked' : ''; ?> />
+                <input type="checkbox" name="ssb_settings[whatsapp_visibility]" class="ssb_admin-visibility-checkbox" <?php echo $this->settings['whatsapp_visibility'] ? 'checked' : ''; ?> />
                 Whatsapp (shown only on mobile displays)
             </label>
             <?php
@@ -269,7 +295,6 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             <?php
         }
         
-
         function filterContent( $content ) {
             if(!$this->isCurrentPostTypeDisplayEnabled())
                 return $html;
@@ -312,31 +337,33 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         function getButtonsHtml($postLink){
             $html = "<div class='ssb_buttons-wrapper'>";
             $order = $this->settings['order'];
+            $iconsSize = $this->settings['icons_size'];
+            $iconsColorStyleString = $this->getIconsColorStyleString();
             for ($i = 0; $i < strlen($order); $i++){
                 switch($order[$i]){
                     case 'f':
                         if($this->settings['facebook_visibility'])
-                            $html .= $this->getFacebookButtonHtml($postLink);
+                            $html .= $this->getFacebookButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 't':
                         if($this->settings['twitter_visibility'])
-                            $html .= $this->getTwitterButtonHtml($postLink);
+                            $html .= $this->getTwitterButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 'g':
                         if($this->settings['google-plus_visibility'])
-                            $html .= $this->getGooglePlusButtonHtml($postLink);
+                            $html .= $this->getGooglePlusButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 'p':
                         if($this->settings['pinterest_visibility'])
-                            $html .= $this->getPinterestButtonHtml($postLink);
+                            $html .= $this->getPinterestButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 'l':
                         if($this->settings['linkedin_visibility'])
-                            $html .= $this->getLinkedinButtonHtml($postLink);
+                            $html .= $this->getLinkedinButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 'w':
                         if($this->settings['whatsapp_visibility'])
-                            $html .= $this->getWhatsAppButtonHtml($postLink);
+                            $html .= $this->getWhatsAppButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                 }
             }
@@ -344,37 +371,36 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             return $html;
         }
 
-        function getFacebookButtonHtml($postLink){
-            $iconSize = $this->settings['icons_size'];
-            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-facebook ssb_icon-{$iconSize}'></i></a>";
+        function getFacebookButtonHtml($postLink, $iconsSize, $iconsColorStyleString){
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-facebook ssb_icon-{$iconsSize}' {$iconsColorStyleString}></i></a>";
         }
 
-        function getTwitterButtonHtml($postLink){
-            $iconSize = $this->settings['icons_size'];
-            return "<a target='_blank' href='https://twitter.com/intent/tweet?url={$postLink}'><i class='fa fa-twitter ssb_icon-{$iconSize}'></i></a>";
+        function getTwitterButtonHtml($postLink, $iconsSize, $iconsColorStyleString){
+            return "<a target='_blank' href='https://twitter.com/intent/tweet?url={$postLink}'><i class='fa fa-twitter ssb_icon-{$iconsSize}' {$iconsColorStyleString}></i></a>";
         }
 
-        function getGooglePlusButtonHtml($postLink){
-            $iconSize = $this->settings['icons_size'];
-            return "<a target='_blank' href='https://plus.google.com/share?url={$postLink}'><i class='fa fa-google-plus ssb_icon-{$iconSize}'></i></a>";
+        function getGooglePlusButtonHtml($postLink, $iconsSize, $iconsColorStyleString){
+            return "<a target='_blank' href='https://plus.google.com/share?url={$postLink}'><i class='fa fa-google-plus ssb_icon-{$iconsSize}' {$iconsColorStyleString}></i></a>";
         }
 
-        function getPinterestButtonHtml($postLink){
-            $iconSize = $this->settings['icons_size'];
-            return "<a target='_blank' href='http://pinterest.com/pin/create/button/?url={$postLink}'><i class='fa fa-pinterest ssb_icon-{$iconSize}'></i></a>";
+        function getPinterestButtonHtml($postLink, $iconsSize, $iconsColorStyleString){
+            return "<a target='_blank' href='http://pinterest.com/pin/create/button/?url={$postLink}'><i class='fa fa-pinterest ssb_icon-{$iconsSize}' {$iconsColorStyleString}></i></a>";
         }
 
-        function getLinkedInButtonHtml($postLink){
-            $iconSize = $this->settings['icons_size'];
-            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-linkedin ssb_icon-{$iconSize}'></i></a>";
+        function getLinkedInButtonHtml($postLink, $iconsSize, $iconsColorStyleString){
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-linkedin ssb_icon-{$iconsSize}' {$iconsColorStyleString}></i></a>";
         }
 
-        function getWhatsAppButtonHtml($postLink){
-            $iconSize = $this->settings['icons_size'];
-            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-whatsapp ssb_icon-{$iconSize}'></i></a>";
+        function getWhatsAppButtonHtml($postLink, $iconsSize, $iconsColorStyleString){
+            return "<a target='_blank' href='https://www.facebook.com/sharer/sharer.php?u={$postLink}&amp;src=sdkpreparse'><i class='fa fa-whatsapp ssb_icon-{$iconsSize}' {$iconsColorStyleString}></i></a>";
         }
 
-
+        function getIconsColorStyleString(){
+            if ($this->settings['icons_color'] != 'custom')
+                return '';
+            $color = $this->settings['icons_custom_color'];
+            return "style='color: {$color}'";
+        }
     }
 
     // Instantiate class

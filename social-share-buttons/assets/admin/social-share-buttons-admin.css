@@ -7,3 +7,7 @@
 
 .ssb_thumbnail-wrapper{position: relative}
 .ssb_thumbnail-wrapper .ssb_buttons-wrapper{position: absolute; right: 0; bottom: 0}
+
+/* Color picker */
+#ssb_admin-color-picker-container{display: inline-block; vertical-align: middle; margin-left: -10px;}
+#ssb_admin-color-picker-container .wp-picker-holder{position: absolute}
