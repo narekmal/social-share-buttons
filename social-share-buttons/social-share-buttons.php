@@ -41,6 +41,7 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             add_action( 'wp_enqueue_scripts', array( $this, 'enqueueStylesScripts') );
             add_filter( 'the_content', array( $this, 'filterContent') );
             add_filter( 'post_thumbnail_html', array( $this, 'filterPostThumbnailHtml') );
+            add_action( 'wp_footer', array( $this, 'addFloatingBar') );
 
             /* Shortcode */
             add_shortcode( 'social-share-buttons', array( $this, 'getShortcodeOutput') );
@@ -302,12 +303,19 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         
         function filterContent( $content ) {
             if(!$this->isCurrentPostTypeDisplayEnabled())
-                return $html;
-            if($this->settings['placing'] != 'after_content')
-                return $html;
+                return $content;
 
-            $postLink = get_the_permalink();
-            $content .= $this->getButtonsHtml($postLink);
+            if($this->settings['placing'] == 'after_content')
+            {
+                $postLink = get_the_permalink();
+                $content .= $this->getButtonsHtml($postLink);
+            }
+
+            if($this->settings['placing'] == 'below_title')
+            {
+                $postLink = get_the_permalink();
+                $content = $this->getButtonsHtml($postLink).$content;
+            }
 
             return $content;
         }
@@ -323,6 +331,19 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             $html = "<div class='ssb_thumbnail-wrapper'>{$html}{$buttonsHtml}</div>";
 
             return $html;
+        }
+
+        function addFloatingBar() {
+            if(!$this->isCurrentPostTypeDisplayEnabled())
+                return;
+            if($this->settings['placing'] != 'floating')
+                return;
+            
+            $postLink = get_the_permalink();
+            $buttonsHtml = $this->getButtonsHtml($postLink);
+            $html = "<div class='ssb_floating-bar'>{$buttonsHtml}</div>";
+
+            echo $html;
         }
 
         function isCurrentPostTypeDisplayEnabled() {

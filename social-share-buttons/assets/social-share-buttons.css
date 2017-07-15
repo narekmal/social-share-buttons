@@ -16,12 +16,16 @@
 .ssb_buttons-wrapper .fa-linkedin {color: #007bb6}
 .ssb_buttons-wrapper .fa-whatsapp {color: #455A64}
 
-
-/* Placement of buttons inside featured image */
+/* Buttons inside featured image */
 .ssb_thumbnail-wrapper{position: relative}
 .ssb_thumbnail-wrapper .ssb_buttons-wrapper{position: absolute; right: 0; bottom: 0}
 
+/* Buttons inside floating bar */
+.ssb_floating-bar {position: fixed; top: 30%; left: 1px; z-index: 9999; border: 1px solid grey; padding: 15px 10px;}
+.ssb_floating-bar a {display: block; text-align: center}
+.ssb_floating-bar .ssb_buttons-wrapper a:not(:last-child) {margin-right: 0; margin-bottom: 10px;}
+
 /* Icon sizes */
-.ssb_icon-small{font-size: 18px}
-.ssb_icon-medium{font-size: 28px}
-.ssb_icon-large{font-size: 38px}
+.ssb_icon-small {font-size: 18px}
+.ssb_icon-medium {font-size: 28px}
+.ssb_icon-large {font-size: 38px}
