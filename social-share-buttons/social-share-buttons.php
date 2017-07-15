@@ -7,7 +7,7 @@ Text Domain: social-share-buttons
 Version: 0.0.1
 */
 
-/* If this file is called directly, abort */
+// If this file is called directly, abort
 if ( ! defined( 'WPINC' ) ) 
 	die;
 
@@ -29,22 +29,30 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
 
         /* Constructor */
         private function __construct() {
-            /* Get settings from DB */
+            // Get settings from DB
             $this->settings = get_option( 'ssb_settings' );
 
-            /* Admin */
+            // Admin
+            register_activation_hook( __FILE__, array( $this, 'addDefaultSettings') );
             add_action( 'admin_enqueue_scripts', array( $this, 'enqueueAdminStylesScripts') );
             add_action( 'admin_menu', array( $this, 'addAdminMenu') );
             add_action( 'admin_init', array( $this, 'addAdminSettings') );
 
-            /* Front end */
+            // Front end
             add_action( 'wp_enqueue_scripts', array( $this, 'enqueueStylesScripts') );
             add_filter( 'the_content', array( $this, 'filterPostContent') );
             add_filter( 'post_thumbnail_html', array( $this, 'filterPostThumbnailHtml') );
             add_action( 'wp_footer', array( $this, 'addFloatingBar') );
 
-            /* Shortcode */
+            // Shortcode
             add_shortcode( 'social-share-buttons', array( $this, 'getShortcodeOutput') );
+        }
+
+        /* Add default settings */
+        function addDefaultSettings() {
+            add_option('ssb_settings', array(
+                'post_type_post' => 'on'
+            ));
         }
 
         /* Enqueue admin styles and scripts */
