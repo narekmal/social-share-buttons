@@ -2,12 +2,13 @@
 
 	$(function() {
         // Init sortable icon list
-        Sortable.create('ssb_admin-sortable-list-container', {
-            elements: $$('#ssb_admin-sortable-list-container i'),
-            overlap: 'horizontal',
-            constraint: 'horizontal',
-            onChange: updateOrderHiddenInput
-        });
+        if ($('#ssb_admin-sortable-list-container').length != 0)
+            Sortable.create('ssb_admin-sortable-list-container', {
+                elements: $$('#ssb_admin-sortable-list-container i'),
+                overlap: 'horizontal',
+                constraint: 'horizontal',
+                onChange: updateOrderHiddenInput
+            });
 
         // Init color picker
         $('#ssb_admin-color-picker-container input').wpColorPicker();

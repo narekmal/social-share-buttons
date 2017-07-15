@@ -38,9 +38,12 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             add_action( 'admin_init', array( $this, 'addAdminSettings') );
 
             /* Front end */
+            add_action( 'wp_enqueue_scripts', array( $this, 'enqueueStylesScripts') );
             add_filter( 'the_content', array( $this, 'filterContent') );
             add_filter( 'post_thumbnail_html', array( $this, 'filterPostThumbnailHtml') );
-            add_action( 'wp_enqueue_scripts', array( $this, 'enqueueStylesScripts') );
+
+            /* Shortcode */
+            add_shortcode( 'social-share-buttons', array( $this, 'getShortcodeOutput') );
         }
 
         function enqueueAdminStylesScripts() {
@@ -53,6 +56,10 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         function enqueueStylesScripts() {
             wp_enqueue_style( 'font-awesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' );
             wp_enqueue_style( 'social-share-buttons', plugin_dir_url( __FILE__ ) . 'assets/social-share-buttons.css' );
+        }
+
+        function getShortcodeOutput(){
+            return $this->getButtonsHtml(get_the_permalink());
         }
 
         function addAdminMenu() {
@@ -170,10 +177,8 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
                 <input type="checkbox" name="ssb_settings[post_type_<?php echo $customPostType->name; ?>]" <?php echo $this->settings["post_type_{$customPostType->name}"] ? 'checked' : ''; ?> />
                 On <?php echo $customPostType->label; ?>
             </label>
-            <?php endforeach;
-            
-            ?>
-            <?php
+            <?php 
+            endforeach;
         }
 
         function outputIconsSizeField() {

@@ -1,3 +1,22 @@
+.ssb_buttons-wrapper a:not(:last-child) {margin-right: 10px}
+/*.ssb_buttons-wrapper i {display: inline-block;
+	text-decoration: none;} 
+.ssb_buttons-wrapper a i, 
+.ssb_buttons-wrapper a:link i, 
+.ssb_buttons-wrapper a:active i, 
+.ssb_buttons-wrapper a:visited i {display: inline-block; text-decoration: none !important; cursor: pointer}
+
+.ssb_buttons-wrapper a:link i {text-decoration: none}*/
+
+/* Default colors of icons */
+.ssb_buttons-wrapper .fa-facebook {color: #3b5998}
+.ssb_buttons-wrapper .fa-twitter {color: #00aced}
+.ssb_buttons-wrapper .fa-google-plus {color: #dd4b39}
+.ssb_buttons-wrapper .fa-pinterest {color: #cb2027}
+.ssb_buttons-wrapper .fa-linkedin {color: #007bb6}
+.ssb_buttons-wrapper .fa-whatsapp {color: #455A64}
+
+
 /* Placement of buttons inside featured image */
 .ssb_thumbnail-wrapper{position: relative}
 .ssb_thumbnail-wrapper .ssb_buttons-wrapper{position: absolute; right: 0; bottom: 0}
