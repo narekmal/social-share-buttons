@@ -21,7 +21,8 @@
 
 /* Buttons inside featured image */
 .ssb_thumbnail-wrapper{position: relative}
-.ssb_thumbnail-wrapper .ssb_buttons-wrapper{position: absolute; right: 0; bottom: 0}
+.ssb_thumbnail-wrapper .ssb_thumbnail-buttons-wrapper{position: absolute; right: 0; bottom: 0; left: 0; display: flex; justify-content: center}
+.ssb_thumbnail-wrapper .ssb_thumbnail-buttons-wrapper .ssb_buttons-wrapper{ padding: 5px 10px; background-color: rgba(255, 255, 255, 0.5)}
 
 /* Buttons inside floating bar */
 .ssb_floating-bar {position: fixed; top: 30%; left: 0; z-index: 9999; border: 1px solid grey; padding: 15px 10px;}

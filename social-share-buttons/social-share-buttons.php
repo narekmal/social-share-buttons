@@ -345,7 +345,11 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             
             $postLink = get_the_permalink();
             $buttonsHtml = $this->getButtonsHtml($postLink);
-            $html = "<div class='ssb_thumbnail-wrapper'>{$html}{$buttonsHtml}</div>";
+            $html = 
+            "<div class='ssb_thumbnail-wrapper'>
+                {$html}
+                <div  class='ssb_thumbnail-buttons-wrapper'>{$buttonsHtml}</div>
+            </div>";
 
             return $html;
         }
