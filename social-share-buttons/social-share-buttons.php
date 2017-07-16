@@ -51,7 +51,18 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         /* Add default settings */
         function addDefaultSettings() {
             add_option('ssb_settings', array(
-                'post_type_post' => 'on'
+                'post_type_post' => 'on',
+                'post_type_page' => 'on',
+                'icons_size' => 'medium',
+                'placing' => 'below_title',
+                'icons_color' => 'original',
+                'facebook_visibility' => 'on',
+                'twitter_visibility' => 'on',
+                'google-plus_visibility' => 'on',
+                'pinterest_visibility' => 'on',
+                'linkedin_visibility' => 'on',
+                'whatsapp_visibility' => 'on',
+                'order' => 'ftgplw'
             ));
         }
 
@@ -280,7 +291,7 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         function outputIconsOrderField() {
             ?>
             <div id="ssb_admin-sortable-list-container">
-                <input id="ssb_admin-icon-order-hidden-input" type="hidden" name="ssb_settings[order]" value="ftgplw" />
+                <input id="ssb_admin-icon-order-hidden-input" type="hidden" name="ssb_settings[order]" value="<?php echo $this->settings['order']; ?>" />
                 <?php 
                 $order = $this->settings['order'];
                 for ($i = 0; $i < strlen($order); $i++){
