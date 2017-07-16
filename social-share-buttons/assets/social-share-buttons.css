@@ -9,19 +9,22 @@
 .ssb_buttons-wrapper a:link i {text-decoration: none}*/
 
 /* Default colors of icons */
-.ssb_buttons-wrapper .fa-facebook {color: #3b5998}
-.ssb_buttons-wrapper .fa-twitter {color: #00aced}
-.ssb_buttons-wrapper .fa-google-plus {color: #dd4b39}
-.ssb_buttons-wrapper .fa-pinterest {color: #cb2027}
-.ssb_buttons-wrapper .fa-linkedin {color: #007bb6}
-.ssb_buttons-wrapper .fa-whatsapp {color: #455A64}
+.ssb_button-facebook {color: #3b5998}
+.ssb_button-twitter {color: #00aced}
+.ssb_button-google-plus {color: #dd4b39}
+.ssb_button-pinterest {color: #cb2027}
+.ssb_button-linkedin {color: #007bb6}
+.ssb_button-whatsapp {color: #455A64}
+
+/* Show whatsapp button only on mobile */
+@media (max-width: 480px) {.ssb_button-whatsapp, .ssb_floating-bar .ssb_button-whatsapp {display: none}}
 
 /* Buttons inside featured image */
 .ssb_thumbnail-wrapper{position: relative}
 .ssb_thumbnail-wrapper .ssb_buttons-wrapper{position: absolute; right: 0; bottom: 0}
 
 /* Buttons inside floating bar */
-.ssb_floating-bar {position: fixed; top: 30%; left: 1px; z-index: 9999; border: 1px solid grey; padding: 15px 10px;}
+.ssb_floating-bar {position: fixed; top: 30%; left: 0; z-index: 9999; border: 1px solid grey; padding: 15px 10px;}
 .ssb_floating-bar a {display: block; text-align: center}
 .ssb_floating-bar .ssb_buttons-wrapper a:not(:last-child) {margin-right: 0; margin-bottom: 10px;}
 
