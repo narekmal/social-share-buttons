@@ -395,7 +395,7 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         }
 
         /* Get buttons' block HTML */
-        function getButtonsHtml($postLink, $args){
+        function getButtonsHtml($postLink, $args = null){
             // Get order, size and color either from $args or from settings
             $order = isset($args['order']) ? $args['order'] : $this->settings['order'];
             $iconsSize = isset($args['size']) ? $args['size'] : $this->settings['icons_size'];

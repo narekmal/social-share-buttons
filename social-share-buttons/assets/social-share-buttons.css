@@ -1,12 +1,5 @@
 .ssb_buttons-wrapper a:not(:last-child) {margin-right: 10px}
-/*.ssb_buttons-wrapper i {display: inline-block;
-	text-decoration: none;} 
-.ssb_buttons-wrapper a i, 
-.ssb_buttons-wrapper a:link i, 
-.ssb_buttons-wrapper a:active i, 
-.ssb_buttons-wrapper a:visited i {display: inline-block; text-decoration: none !important; cursor: pointer}
-
-.ssb_buttons-wrapper a:link i {text-decoration: none}*/
+.ssb_buttons-wrapper a {border: 0 !important}
 
 /* Default colors of icons */
 .ssb_button-facebook {color: #3b5998}
