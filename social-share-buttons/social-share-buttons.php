@@ -81,8 +81,19 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         }
 
         /* Return HTML output of [social-share-buttons] shortcode */
-        function getShortcodeOutput(){
-            return $this->getButtonsHtml(get_the_permalink());
+        function getShortcodeOutput($shortcodeAttributes){
+            $args = array();
+            // Validate shortcode attributes
+            if(isset($shortcodeAttributes['size']) && in_array($shortcodeAttributes['size'], array('small', 'medium', 'large')))
+                $args['size'] = $shortcodeAttributes['size'];
+            if(isset($shortcodeAttributes['color']) && preg_match("/^#([a-f0-9]{3}){1,2}$/i", $shortcodeAttributes['color']))
+                $args['color'] = $shortcodeAttributes['color'];
+            if(isset($shortcodeAttributes['order']) && preg_match("/^[ftgplw]{1,6}$/", $shortcodeAttributes['order']))
+                $args['order'] = $shortcodeAttributes['order'];
+            return
+                "<div class='ssb_shortcode-output'>"
+                .$this->getButtonsHtml(get_the_permalink(), $args)
+                ."</div>";
         }
 
         /* Add menu subitem to Settings menu */
@@ -384,35 +395,40 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         }
 
         /* Get buttons' block HTML */
-        function getButtonsHtml($postLink){
+        function getButtonsHtml($postLink, $args){
+            // Get order, size and color either from $args or from settings
+            $order = isset($args['order']) ? $args['order'] : $this->settings['order'];
+            $iconsSize = isset($args['size']) ? $args['size'] : $this->settings['icons_size'];
+            $iconsColor = isset($args['color']) ? $args['color'] : 
+                ($this->settings['icons_color'] == 'custom' ? $this->settings['icons_custom_color'] : '');
+
             $html = "<div class='ssb_buttons-wrapper'>";
-            $order = $this->settings['order'];
-            $iconsSize = $this->settings['icons_size'];
-            $iconsColorStyleString = $this->getIconsColorStyleString();
+            $iconsColorStyleString = !empty($iconsColor) ? "style='color: {$iconsColor}'" : "";
             for ($i = 0; $i < strlen($order); $i++){
                 switch($order[$i]){
                     case 'f':
-                        if($this->settings['facebook_visibility'])
+                        // If order is set via $args, no need to check for visibility setting
+                        if(isset($args['order']) || $this->settings['facebook_visibility'])
                             $html .= $this->getFacebookButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 't':
-                        if($this->settings['twitter_visibility'])
+                        if(isset($args['order']) || $this->settings['twitter_visibility'])
                             $html .= $this->getTwitterButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 'g':
-                        if($this->settings['google-plus_visibility'])
+                        if(isset($args['order']) || $this->settings['google-plus_visibility'])
                             $html .= $this->getGooglePlusButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 'p':
-                        if($this->settings['pinterest_visibility'])
+                        if(isset($args['order']) || $this->settings['pinterest_visibility'])
                             $html .= $this->getPinterestButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 'l':
-                        if($this->settings['linkedin_visibility'])
+                        if(isset($args['order']) || $this->settings['linkedin_visibility'])
                             $html .= $this->getLinkedinButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                     case 'w':
-                        if($this->settings['whatsapp_visibility'])
+                        if(isset($args['order']) || $this->settings['whatsapp_visibility'])
                             $html .= $this->getWhatsAppButtonHtml($postLink, $iconsSize, $iconsColorStyleString);
                         break;
                 }
@@ -449,14 +465,6 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
         /* Get WhatsApp button HTML */
         function getWhatsAppButtonHtml($postLink, $iconsSize, $iconsColorStyleString){
             return "<a target='_blank' href='whatsapp://send?text={$postLink}' class='ssb_button-whatsapp'><i class='fa fa-whatsapp ssb_icon-{$iconsSize}' {$iconsColorStyleString}></i></a>";
-        }
-
-        /* Retrieve custom icons color code from settings if set, and return style attribute string based on it */
-        function getIconsColorStyleString(){
-            if ($this->settings['icons_color'] != 'custom')
-                return '';
-            $color = $this->settings['icons_custom_color'];
-            return "style='color: {$color}'";
         }
     }
 

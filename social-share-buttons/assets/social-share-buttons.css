@@ -33,3 +33,6 @@
 .ssb_icon-small {font-size: 18px}
 .ssb_icon-medium {font-size: 28px}
 .ssb_icon-large {font-size: 38px}
+
+/* Shortcode output */
+.ssb_shortcode-output, .ssb_shortcode-output .ssb_buttons-wrapper {display: inline}
