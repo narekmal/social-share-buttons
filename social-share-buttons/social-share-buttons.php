@@ -123,10 +123,38 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
             <?php
         }
 
+        /* Sanitize and validate option values */
+        function sanitizeOptions( $input ) {
+            // Array for storing the validated options
+            $output = array();
+            // Loop through each of the incoming options
+            foreach( $input as $key => $value ) {
+                // Check to see if the current option has a value. If so, process it.
+                if( isset( $input[$key] ) ) {
+                    // Strip all HTML and PHP tags and properly handle quoted strings
+                    $output[$key] = strip_tags( stripslashes( $input[ $key ] ) );
+                } 
+            } 
+
+            // Validate custom icon color field
+            if( isset( $input['icons_custom_color'] ) ) 
+                if(!preg_match("/^#([a-f0-9]{3}){1,2}$/i", $input['icons_custom_color'])){
+                    // If invalid color code is specified, add message, remove the invalid value and set color to original
+                    add_settings_error(
+                        'ssb_settings_icons_colors', 'ssb_admin-invalid-color',
+                        __('Invalid custom color specified', 'social-share-buttons'), 'error'
+                    );
+                    unset($output['icons_custom_color']);
+                    $output['icons_color'] = 'original';
+                }
+
+            return $output;
+        }
+
         /* Register settings, sections, fields using the Settings API */
         function addAdminSettings() {
             // Register a setting
-            register_setting('ssb_settings', 'ssb_settings');
+            register_setting('ssb_settings', 'ssb_settings', array( $this, 'sanitizeOptions'));
         
             // Register a section 
             add_settings_section(
