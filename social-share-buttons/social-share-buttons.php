@@ -56,6 +56,7 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
                 'icons_size' => 'medium',
                 'placing' => 'below_title',
                 'icons_color' => 'original',
+                'icons_custom_color' => '#ffffff',
                 'facebook_visibility' => 'on',
                 'twitter_visibility' => 'on',
                 'google-plus_visibility' => 'on',
@@ -144,7 +145,7 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
                         'ssb_settings_icons_colors', 'ssb_admin-invalid-color',
                         __('Invalid custom color specified', 'social-share-buttons'), 'error'
                     );
-                    unset($output['icons_custom_color']);
+                    $output['icons_custom_color'] = '#ffffff';
                     $output['icons_color'] = 'original';
                 }
 
