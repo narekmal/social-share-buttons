@@ -154,10 +154,10 @@ if ( !class_exists( 'SocialShareButtonsPlugin' ) ) {
 
         /* Register settings, sections, fields using the Settings API */
         function addAdminSettings() {
-            // Register a setting
+            // Register setting
             register_setting('ssb_settings', 'ssb_settings', array( $this, 'sanitizeOptions'));
         
-            // Register a section 
+            // Register section 
             add_settings_section(
                 'ssb_settings_section',
                 __('Social Share Buttons Settings', 'social-share-buttons'),
